@@ -13,7 +13,7 @@
 
 ## Схема
 
-![Scheme](figs/schema.png)
+![schema](figs/schema.png)
 
 ## Описание коллекций
 
