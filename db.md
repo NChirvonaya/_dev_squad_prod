@@ -13,7 +13,7 @@
 
 ## Схема
 
-![Scheme](NChirvonaya/_dev_squad_prod/docs/schema.png)
+![Scheme](docs/schema.png)
 
 ## Описание коллекций
 
