@@ -1,9 +1,8 @@
 from flask import Flask, redirect, url_for, render_template, flash, request, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
+
 from flask_login import LoginManager, UserMixin, login_user, logout_user,\
     current_user, login_required, login_manager
-from app.oauth import OAuthSignIn
-from InstagramAPI import InstagramAPI
+
 
 from app.client import MyClient
 from app.client import getWebAPI
