@@ -126,3 +126,6 @@ conf.json
 # Don't mind it. Was checking gitstats package
 stats/
 .DS_Store
+
+# IDE files
+.vscode/

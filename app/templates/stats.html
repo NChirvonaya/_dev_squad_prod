@@ -7,6 +7,22 @@
 <!-- 
     <script src="js/bootstrap.js"></script> -->
     <title>Instagrammer</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .row {
+        display: flex;
+    }
+
+    /* Create two equal columns that sits next to each other */
+    .column {
+        flex: 50%;
+        padding: 10px;
+        height: 50px;
+    }
+</style>
 </head>
 
 <body>
@@ -26,16 +42,27 @@
                     <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" href="/login">Log in<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/stats">Stats<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/premium">Get premium<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/logout">Log out<span class="sr-only">(current)</span></a>
                 </li>
             </ul>
         </div>
     </nav>
-    
+
     <div class="container">
-        <h1 align="center">Welcome to Instagrammer</h1>
-    
-        <p>Privacy policy is available <a href="policy">here</a>.</p>
+        <br>
+        <h1 align="center">Let's count some statistics</h1>
+        
+        <br>
+        <a class="btn btn-primary btn-lg btn-block" id="mine" href='/stats/personal'>Get mine</a>
+
+        <a class="btn btn-primary btn-lg btn-block" id="their" href='/stats/user'>Get their</a>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
