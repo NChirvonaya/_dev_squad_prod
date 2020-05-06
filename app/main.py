@@ -11,7 +11,6 @@ from app.user import User
 
 
 api = MyClient()
-user = User(MyClient())
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 # login_manager = LoginManager(app)
