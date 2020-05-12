@@ -8,6 +8,8 @@ from app.client import MyClient
 from app.client import getWebAPI
 from app.analyser import Analyser
 from app.user import User
+from instagram_web_api.errors import ClientCookieExpiredError
+from instagram_web_api.errors import ClientLoginRequiredError
 
 
 api = MyClient()
@@ -51,10 +53,11 @@ def stats():
 @app.route('/stats/personal', methods=['GET', 'POST'])
 # @login_required
 def personal_stats():
-    error = user.username
+    # error = user.username
     # if request.method == 'POST':
         # login = request.form['username']
-    return render_template('stats/personal.html', error=error)
+    # return render_template('stats/personal.html', error=error)
+    return render_template('stats/personal.html')
 
 @app.route('/stats/user', methods=['GET', 'POST'])
 # @login_required
