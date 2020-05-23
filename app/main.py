@@ -19,13 +19,13 @@ app.secret_key = 'super secret key'
 # def load_user(user_id):
 #     return User.get(user_id)
 
-@app.route('/js/<path:path>')
-def send_js(path):
-    return send_from_directory('js', path)
+# @app.route('/js/<path:path>')
+# def send_js(path):
+#     return send_from_directory('js', path)
 
-@app.route('/css/<path:path>')
-def send_css(path):
-    return send_from_directory('css', path)
+# @app.route('/css/<path:path>')
+# def send_css(path):
+#     return send_from_directory('css', path)
 
 @app.route("/policy")
 def policy_view():

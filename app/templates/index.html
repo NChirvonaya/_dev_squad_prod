@@ -6,6 +6,7 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <!-- 
     <script src="js/bootstrap.js"></script> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_local.css') }}">
     <title>Instagrammer</title>
 </head>
 
@@ -34,8 +35,10 @@
     
     <div class="container">
         <h1 align="center">Welcome to Instagrammer</h1>
+
+        <img src="{{ url_for('static', filename='index.svg') }}" align="middle" class="index_image">
     
-        <p>Privacy policy is available <a href="policy">here</a>.</p>
+        <!-- <p>Privacy policy is available <a href="policy">here</a>.</p> -->
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
