@@ -9,6 +9,8 @@ from app.client import getWebAPI
 from app.analyser import Analyser
 from app.user import User
 
+import json
+from dataclasses import dataclass, asdict
 
 api = MyClient()
 app = Flask(__name__)
@@ -39,45 +41,93 @@ def index():
 @app.route('/logout')
 # @login_required
 def logout():
-    logout_user()
+    # logout_user()
     return redirect(url_for('index'))
 
+@dataclass
+class Resp:
+    w_com: int = 0
+    wt_com: int = 1
+    post_pos: int = 2
+    post_neg: int = 3
+    post_neu: int = 4
+    com_all: int = 5
+    com_pos: int = 6
+    com_neg: int = 7
+    com_neu: int = 8
+    com_unq: int = 9
 
 @app.route('/stats', methods=['GET', 'POST'])
 # @login_required
 def stats():
-    return render_template('stats.html', title='Stats')
-
-@app.route('/stats/personal', methods=['GET', 'POST'])
-# @login_required
-def personal_stats():
-    error = user.username
-    # if request.method == 'POST':
-        # login = request.form['username']
-    return render_template('stats/personal.html', error=error)
-
-@app.route('/stats/user', methods=['GET', 'POST'])
-# @login_required
-def user_enter_stats():
     if request.method == 'POST':
+        error = None
         login = request.form['username']
+        if login is None or login == '':
+            error = 'Empty username'
+            return render_template('stats.html', title='Stats', error = error)
         date_from = request.form['from']
         date_to = request.form['to']
-        return redirect(url_for('user_stats', username=login, date_from=date_from, date_to=date_to))
-    return render_template('stats/user.html')
+        resp = Resp()
+        return redirect(
+            url_for(
+                'user_stats',
+                response_cur=json.dumps(
+                    asdict(resp)
+                ), 
+                username=login, 
+                date_from=date_from, 
+                date_to=date_to
+            )
+        )
+    return render_template('stats.html', title='Stats')
+
+# @app.route('/stats/personal', methods=['GET', 'POST'])
+# # @login_required
+# def personal_stats():
+#     # error = user.username
+#     # if request.method == 'POST':
+#         # login = request.form['username']
+#     response_cur = request.args['response_cur']
+#     resp_dict = json.loads(response_cur)
+#     response_cur = Resp(**resp_dict)
+#     print(response_cur)
+    
+#     return render_template('stats/personal.html', resp=response_cur)
+
+# @app.route('/stats/user', methods=['GET', 'POST'])
+# # @login_required
+# def user_enter_stats():
+#     if request.method == 'POST':
+#         login = request.form['username']
+#         date_from = request.form['from']
+#         date_to = request.form['to']
+#         print('Request: ', request.form)
+#         return redirect(url_for('user_stats', username=login, date_from=date_from, date_to=date_to))
+#     return render_template('stats/user.html')
 
 
 @app.route('/stats/<username>')
 # @login_required
-def user_stats(username, date_from, date_to):
-    return render_template('stats/username.html', name=username)
+def user_stats(
+        username, 
+        # date_from, 
+        # date_to
+):
+    print("Args:", request.args)
+    date_from = request.args['date_from']
+    date_to = request.args['date_to']
+    response_cur = request.args['response_cur']
+    resp_dict = json.loads(response_cur)
+    response_cur = Resp(**resp_dict)
+    return render_template('stats/personal.html', name=username, resp=response_cur)
 
-@app.route('/premium', methods=['GET', 'POST'])
-# @login_required
-def premium():
-    if request.method == 'POST':
-        flash('You are Premium user now!')
-    return render_template('premium.html', title='Premium')
+# @app.route('/premium', methods=['GET', 'POST'])
+# # @login_required
+# def premium():
+#     if request.method == 'POST':
+#         flash('You are Premium user now!')
+#     return render_template('premium.html', title='Premium')
 
 # Route for handling the login page logic
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,14 +136,15 @@ def login():
     if request.method == 'POST':
         login = request.form['username']
         password = request.form['password']
-        try:
-            api = getWebAPI(login, password)
-            if api.is_authenticated:
-                 return redirect('/stats')
-            else:
-                error = 'Failed to login. Please, try again.'
-        except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
-            error = 'Invalid Credentials. Please try again.'
+        return redirect('/stats')
+        # try:
+        #     api = getWebAPI(login, password)
+        #     if api.is_authenticated:
+        #         return redirect('/stats')
+        #     else:
+        #         error = 'Failed to login. Please, try again.'
+        # except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
+        #     error = 'Invalid Credentials. Please try again.'
             
 
         # api = InstagramAPI(login, password)
