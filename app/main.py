@@ -101,6 +101,42 @@ def stats():
     
 #     return render_template('stats/personal.html', resp=response_cur)
 
+
+@app.route('/stats/post', methods=['GET', 'POST'])
+# @login_required
+def post_stats():
+    if request.method == 'POST':
+        error = None
+        url = request.form['url']
+        if url is None or url == '':
+            error = 'Empty URL'
+            return render_template('stats/post.html', title='Post', error=error)
+        resp = Resp()
+        return redirect(
+            url_for(
+                'publ_stats',
+                response_cur=json.dumps(
+                    asdict(resp)
+                ),
+                addr=url
+            )
+        )
+    return render_template('stats/post.html', title='Post')
+
+
+@app.route('/stats/post/<addr>')
+# @login_required
+def publ_stats(
+        addr,
+        # date_from,
+        # date_to
+):
+    print("Args:", request.args)
+    response_cur = request.args['response_cur']
+    resp_dict = json.loads(response_cur)
+    response_cur = Resp(**resp_dict)
+    return render_template('stats/publication.html', name=addr, resp=response_cur)
+
 @app.route('/stats/profile', methods=['GET', 'POST'])
 # @login_required
 def profile_stats():
@@ -109,7 +145,7 @@ def profile_stats():
         login = request.form['username']
         if login is None or login == '':
             error = 'Empty username'
-            return render_template('profile.html', title='Stats', error=error)
+            return render_template('stats/profile.html', title='Stats', error=error)
         date_from = request.form['from']
         date_to = request.form['to']
         resp = Resp()
