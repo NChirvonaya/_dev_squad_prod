@@ -29,6 +29,12 @@ app.secret_key = 'super secret key'
 # def send_css(path):
 #     return send_from_directory('css', path)
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
+
 @app.route("/policy")
 def policy_view():
     return render_template('policy.html', title='Privacy policy')
@@ -60,26 +66,26 @@ class Resp:
 @app.route('/stats', methods=['GET', 'POST'])
 # @login_required
 def stats():
-    if request.method == 'POST':
-        error = None
-        login = request.form['username']
-        if login is None or login == '':
-            error = 'Empty username'
-            return render_template('stats.html', title='Stats', error = error)
-        date_from = request.form['from']
-        date_to = request.form['to']
-        resp = Resp()
-        return redirect(
-            url_for(
-                'user_stats',
-                response_cur=json.dumps(
-                    asdict(resp)
-                ), 
-                username=login, 
-                date_from=date_from, 
-                date_to=date_to
-            )
-        )
+    # if request.method == 'POST':
+    #     error = None
+    #     login = request.form['username']
+    #     if login is None or login == '':
+    #         error = 'Empty username'
+    #         return render_template('stats.html', title='Stats', error = error)
+    #     date_from = request.form['from']
+    #     date_to = request.form['to']
+    #     resp = Resp()
+    #     return redirect(
+    #         url_for(
+    #             'user_stats',
+    #             response_cur=json.dumps(
+    #                 asdict(resp)
+    #             ), 
+    #             username=login, 
+    #             date_from=date_from, 
+    #             date_to=date_to
+    #         )
+    #     )
     return render_template('stats.html', title='Stats')
 
 # @app.route('/stats/personal', methods=['GET', 'POST'])
@@ -95,19 +101,33 @@ def stats():
     
 #     return render_template('stats/personal.html', resp=response_cur)
 
-# @app.route('/stats/user', methods=['GET', 'POST'])
-# # @login_required
-# def user_enter_stats():
-#     if request.method == 'POST':
-#         login = request.form['username']
-#         date_from = request.form['from']
-#         date_to = request.form['to']
-#         print('Request: ', request.form)
-#         return redirect(url_for('user_stats', username=login, date_from=date_from, date_to=date_to))
-#     return render_template('stats/user.html')
+@app.route('/stats/profile', methods=['GET', 'POST'])
+# @login_required
+def profile_stats():
+    if request.method == 'POST':
+        error = None
+        login = request.form['username']
+        if login is None or login == '':
+            error = 'Empty username'
+            return render_template('profile.html', title='Stats', error=error)
+        date_from = request.form['from']
+        date_to = request.form['to']
+        resp = Resp()
+        return redirect(
+            url_for(
+                'user_stats',
+                response_cur=json.dumps(
+                    asdict(resp)
+                ),
+                username=login,
+                date_from=date_from,
+                date_to=date_to
+            )
+        )
+    return render_template('stats/profile.html', title='Stats')
 
 
-@app.route('/stats/<username>')
+@app.route('/stats/profile/<username>')
 # @login_required
 def user_stats(
         username, 

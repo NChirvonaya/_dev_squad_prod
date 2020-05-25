@@ -10,44 +10,12 @@
         <br>
         <form action="" method="post">
             <div class="form-row">
-                <div class="col">
-                    <input type="text" class="form-control" placeholder="Username" name="username" value="{{
-                                      request.form.username }}">
-                </div>
-                <div class="col">
-                    <input type="date" class="form-control" placeholder="From" name="from" id="datefrom" >
-                </div>
-                <div class="col">
-                    <input type="date" class="form-control" placeholder="To" name="to" id="dateto" >
-                </div>
+            <a class="btn btn-primary btn-lg btn-block but-prim" id="profile" href='/stats/profile'>Profile</a>
+            <a class="btn btn-primary btn-lg btn-block but-prim" id="post" href='/stats/post'>Post</a>
             </div>
-            <br>
-            {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    <strong>Error:</strong> {{ error }}
-                </div>
-            {% endif %}
-            <input class="btn btn-primary btn-lg btn-block but-prim" type="submit" value="Go!">
         </form>
 
         <img src="{{ url_for('static', filename='stat.svg') }}" align="middle" class="stat_image">
     </div>
-
-    <script>
-        $('#datefrom').datetimepicker({
-            format: 'DD-MM-YYYY',
-            locale: 'ru',
-            defaultDate: moment(),
-            maxDate: moment()
-        });
-    </script>
-    <script>
-        $('#dateto').datetimepicker({
-            format: 'DD-MM-YYYY',
-            locale: 'ru',
-            defaultDate: moment(),
-            maxDate: moment()
-        });
-    </script>
 
 {% endblock%}
