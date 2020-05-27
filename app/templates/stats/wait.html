@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<script>
+    $(function(){
+    setInterval(oneSecondFunction, 5000);
+    });
+
+    function oneSecondFunction() {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", window.location.href + "/_ready", false ); // false for synchronous request
+        xmlHttp.send( null );
+        var isReady = JSON.parse(xmlHttp.responseText).ready
+        if (isReady){
+            window.location.href = window.location.href
+        }
+        else{
+        }
+        return ;
+    }
+</script>
+
+{% endblock%}

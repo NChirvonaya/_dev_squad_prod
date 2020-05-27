@@ -1,3 +1,16 @@
+@media (max-width: @screen-xs) {
+    body {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: @screen-sm) {
+    body {
+        font-size: 14px;
+    }
+}
+
+
 body {
     font-family: 'Open Sans', sans-serif;
 }
@@ -10,21 +23,29 @@ h1 {
     font-family: 'Poiret One', cursive;
 }
 
-.index_image {
-    max-width: 60%; 
-    display:block; 
+.login-image {
+    max-width: 100%;
+    display:block;
+    margin:auto;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.index-image {
+    max-width: 60%;
+    display: block;
+    margin: auto;
+}
+
+.stat-image {
+    max-width: 80%;
+    display:block;
     margin:auto;
 }
 
-.stat_image {
-    max-width: 80%; 
-    display:block; 
-    margin:auto;
-}
-
-.stat_val_image {
+.stat-val-image {
     /* max-width: 100%;  */
-    display:block; 
+    display:block;
     margin:auto;
     align-content: flex-start;
 }
@@ -36,7 +57,7 @@ h1 {
 }
 
 .but-prim:hover {
-  background-color: #FF725E; 
+  background-color: #FF725E;
   color: white;
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
@@ -47,7 +68,7 @@ h1 {
   outline: none !important;
   box-shadow: none !important;
 }
-/* 
+/*
 .but-prim:focus {
   background-color: #FF725E !important;
   border: none !important;
