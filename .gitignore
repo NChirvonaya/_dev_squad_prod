@@ -125,3 +125,6 @@ conf.json
 
 # IDE files
 .vscode/
+
+# SQLite database files
+*.db
