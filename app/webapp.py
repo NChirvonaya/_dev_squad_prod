@@ -1,6 +1,14 @@
+import os
 from urllib.parse import urlparse
 
-from flask import Blueprint, redirect, url_for, render_template, request
+from flask import (
+    Blueprint,
+    redirect,
+    url_for,
+    render_template,
+    request,
+    send_from_directory
+)
 from flask_login import current_user, login_required, login_user, logout_user
 
 from werkzeug.urls import url_parse
@@ -17,12 +25,21 @@ from app.analytics import (
 )
 
 import json
-from dataclasses import dataclass, asdict
 
 server_bp = Blueprint("main", __name__)
 
 
 ANALYTICS = InstAnalytics()
+
+
+@server_bp.route('/favicon.ico')
+def favicon():
+    """Loads favicon."""
+    return send_from_directory(
+        os.path.join(server_bp.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
 
 
 @server_bp.errorhandler(404)
