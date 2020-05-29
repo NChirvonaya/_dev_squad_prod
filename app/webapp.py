@@ -1,3 +1,4 @@
+"""Declare Flask routes."""
 import os
 from urllib.parse import urlparse
 
@@ -7,7 +8,7 @@ from flask import (
     url_for,
     render_template,
     request,
-    send_from_directory
+    send_from_directory,
 )
 from flask_login import current_user, login_required, login_user, logout_user
 
@@ -32,18 +33,18 @@ server_bp = Blueprint("main", __name__)
 ANALYTICS = InstAnalytics()
 
 
-@server_bp.route('/favicon.ico')
+@server_bp.route("/favicon.ico")
 def favicon():
     """Loads favicon."""
     return send_from_directory(
-        os.path.join(server_bp.root_path, 'static'),
-        'favicon.ico',
-        mimetype='image/vnd.microsoft.icon'
+        os.path.join(server_bp.root_path, "static"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
     )
 
 
 @server_bp.errorhandler(404)
-def page_not_found(e):
+def page_not_found(error):
     """404 page."""
     # note that we set the 404 status explicitly
     return render_template("404.html"), 404
@@ -126,13 +127,13 @@ def profile_stats():
         to_date = request.form["to"]
         if login is None or login == "":
             error = "Empty username"
-            return render_template("profile.html", title="Stats", error=error)
+            return render_template("stats/profile.html", title="Stats", error=error)
         return redirect(
             url_for(
                 "main.user_stats",
                 username=login,
                 from_date=from_date,
-                to_date=to_date
+                to_date=to_date,
             )
         )
     return render_template("stats/profile.html", title="Stats")
@@ -141,11 +142,11 @@ def profile_stats():
 @server_bp.route("/stats/profile/<username>")
 @login_required
 def user_stats(username):
-    results = ANALYTICS.get_profile_results(username)
-    from_date = request.args["from_date"]
-    to_date = request.args["to_date"]
+    search_from = request.args["from_date"]
+    search_to = request.args["to_date"]
+    results = ANALYTICS.get_profile_results(username, search_from, search_to)
 
-    print("dates", from_date, to_date)
+    print("dates", search_from, search_to)
     if not results:
         ANALYTICS.get_profile_results(username)
         return render_template("stats/wait.html")
@@ -216,6 +217,7 @@ def post_link_stats(post_link):
 @server_bp.route("/stats/post/<post_link>/_ready")
 @login_required
 def post_link_stats__ready(post_link):
+    """Top secret page."""
     post_link = post_link
     if ANALYTICS.get_post_results(post_link):
         return {"ready": True}
