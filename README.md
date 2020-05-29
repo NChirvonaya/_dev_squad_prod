@@ -8,7 +8,7 @@
 
 **Пароль:** `mpi1922`
 
-Приложение развёрнуто [ссылке](https://devsquadprod.herokuapp.com/).
+Приложение развёрнуто [ссылке](http://oberonbythebeach.com/).
 
 ## Архитектура
 
