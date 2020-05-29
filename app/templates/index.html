@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div class="container">
-        <h1 class="display-2 d-none d-xl-block" align="center">Welcome to Instagrammer!</h1>
-        <h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Welcome to Instagrammer!</h1>
-        <h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Welcome to Instagrammer!</h1>
+    <h1 class="display-2 d-none d-xl-block" align="center">Welcome to Instagrammer!</h1>
+    <h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Welcome to Instagrammer!</h1>
+    <h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Welcome to Instagrammer!</h1>
 
-        <img src="{{ url_for('static', filename='index.svg') }}" align="middle" class="index-image">
+    <img src="{{ url_for('static', filename='index.svg') }}" align="middle" class="index-image">
 
-        <!-- <p>Privacy policy is available <a href="policy">here</a>.</p> -->
-    </div>
+    <!-- <p>Privacy policy is available <a href="policy">here</a>.</p> -->
+
 
 {% endblock%}

@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div class="container">
         <br>
         <h1 class="display-2 d-none d-xl-block" align="center">Let's count some statistics</h1>
         <h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Let's count some statistics</h1>
@@ -16,6 +15,5 @@
         </form>
 
         <img src="{{ url_for('static', filename='stat.svg') }}" align="middle" class="stat-image">
-    </div>
 
 {% endblock%}
