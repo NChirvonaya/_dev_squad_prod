@@ -154,12 +154,12 @@ class InstAnalytics:
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
         time.sleep(self._wait_time)
-        uid = 0
+        uid = -1
         try:
-            uid = self.api.user_info2(username)["id"]
+            uid = self._api.user_info2(username)["id"]
         except:
             # пользователь не найден
-            uid = -1
+            pass
         return uid
 
     def _load_symbols_list(self, rel_path: str):
