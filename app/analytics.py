@@ -154,7 +154,13 @@ class InstAnalytics:
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
         time.sleep(self._wait_time)
-        return self._api.user_info2(username)["id"]
+        uid = 0
+        try:
+            uid = self.api.user_info2(username)["id"]
+        except:
+            # пользователь не найден
+            uid = -1
+        return uid
 
     def _load_symbols_list(self, rel_path: str):
         """Возвращает список символов, прочитанных из файла.
