@@ -146,10 +146,16 @@ class InstAnalytics:
         self._ordered_posts: set = set()
 
     def _get_web_api(self) -> InstClient:
-        # ждем некоторое время, так как нельзя подряд делать
-        # бесконечное число http-запросов
-        time.sleep(self._wait_time)
-        return InstClient(auto_patch=True, drop_incompat_keys=False)
+        while (1):
+            # ждем некоторое время, так как нельзя подряд делать
+            # бесконечное число http-запросов
+            time.sleep(self._wait_time)
+            try:
+                client = InstClient(auto_patch = True, drop_incompat_keys = False)
+                return client
+            except:
+                # если подключиться не удалось, пытаемся переподключиться
+                continue
 
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
@@ -191,10 +197,14 @@ class InstAnalytics:
 
         while has_next_page:
             time.sleep(self._wait_time)
-
-            all_media = self._api.user_feed(
-                user_id, count=50, end_cursor=next_page, extract=False
-            )
+            
+            # загружаем посты
+            all_media = []
+            try:
+                all_media = self._api.user_feed(user_id, count = 50, end_cursor = next_page, extract = False)
+            except:
+                # если запрос не прошел, посылаем его заново
+                continue
 
             # записываем id полученных медиа профиля в лист
             for item in all_media["data"]["user"][
@@ -482,7 +492,7 @@ class InstAnalytics:
         )
         if saved:
             return saved
-        print("started")
+        
         # получаем списки смайлов и символов
         all_emoji_list = self._load_symbols_list(
             "app/helper_files/all_emoji_list"
@@ -496,7 +506,6 @@ class InstAnalytics:
         permitted_nickname_symbols = self._load_symbols_list(
             "app/helper_files/nickname_symbols_list"
         )
-        print("next_1")
 
         username = cache_footprint[0]
         dt_begin = cache_footprint[1]
@@ -561,7 +570,7 @@ class InstAnalytics:
             "com_neu": neu_comms_cnt,
             "com_unq": commentators_cnt,
         }
-        print("finished")
+        
         self._save_profile_result(cache_footprint, stats_dict)
         return stats_dict
 
@@ -626,7 +635,6 @@ class InstAnalytics:
 
     def _store_post_result(self, post_link, stats_dict: dict):
         db = self._get_db()
-        print(stats_dict)
         db.post.update_one(
             {"post_link": post_link}, {"$set": stats_dict}, upsert=True
         )
