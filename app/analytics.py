@@ -167,6 +167,29 @@ class InstAnalytics:
             # пользователь не найден
             pass
         return uid
+    
+    # проверка существования поста
+    def checkPostExistance(self, link):
+        
+        splitted_link = link.split('/')
+        if (len(splitted_link) != 6
+            or (splitted_link[0] != 'https:' and splitted_link[0] != 'http:')
+            or splitted_link[1] !=  ''
+            or splitted_link[2] != 'www.instagram.com'
+            or splitted_link[3] !=  'p'
+            or splitted_link[5] !=  ''
+           ):
+            return False
+        
+        for i in range(7):
+            try:
+                time.sleep(self._wait_time)
+                post_comments = self._api.media_comments(splitted_link[4], count = 50)
+                return True
+            except Exception as err:
+                pass
+        
+        return False
 
     def _load_symbols_list(self, rel_path: str):
         """Возвращает список символов, прочитанных из файла.
