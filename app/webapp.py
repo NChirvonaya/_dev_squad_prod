@@ -127,7 +127,9 @@ def profile_stats():
         to_date = request.form["to"]
         if login is None or login == "":
             error = "Empty username"
-            return render_template("stats/profile.html", title="Stats", error=error)
+            return render_template(
+                "stats/profile.html", title="Stats", error=error
+            )
         return redirect(
             url_for(
                 "main.user_stats",

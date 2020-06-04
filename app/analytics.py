@@ -146,12 +146,12 @@ class InstAnalytics:
         self._ordered_posts: set = set()
 
     def _get_web_api(self) -> InstClient:
-        while (1):
+        while True:
             # ждем некоторое время, так как нельзя подряд делать
             # бесконечное число http-запросов
             time.sleep(self._wait_time)
             try:
-                client = InstClient(auto_patch = True, drop_incompat_keys = False)
+                client = InstClient(auto_patch=True, drop_incompat_keys=False)
                 return client
             except Exception as err:
                 # если подключиться не удалось, пытаемся переподключиться
@@ -197,11 +197,13 @@ class InstAnalytics:
 
         while has_next_page:
             time.sleep(self._wait_time)
-            
+
             # загружаем посты
             all_media = []
             try:
-                all_media = self._api.user_feed(user_id, count = 50, end_cursor = next_page, extract = False)
+                all_media = self._api.user_feed(
+                    user_id, count=50, end_cursor=next_page, extract=False
+                )
             except Exception as err:
                 # если запрос не прошел, посылаем его заново
                 continue
@@ -268,10 +270,9 @@ class InstAnalytics:
             # оставляем только нужную информацию
             for comm in post_comments:
                 if dt_begin is not None and dt_end is not None:
-                    if (
-                        dt_begin <= datetime.fromtimestamp(comm["created_at"])
-                        and dt_end >= datetime.fromtimestamp(comm["created_at"])
-                    ):
+                    if dt_begin <= datetime.fromtimestamp(
+                        comm["created_at"]
+                    ) and dt_end >= datetime.fromtimestamp(comm["created_at"]):
                         res.append(
                             Comment(
                                 media_id,
@@ -292,12 +293,7 @@ class InstAnalytics:
 
         return res
 
-    def _get_posts_comments(
-            self,
-            posts,
-            dt_begin=None,
-            dt_end=None
-    ):
+    def _get_posts_comments(self, posts, dt_begin=None, dt_end=None):
         """Возвращает все комменты к списку постов."""
         res = []
         for item in posts:
@@ -458,12 +454,7 @@ class InstAnalytics:
         parts = link.split("/")
         return parts[4]
 
-    def _get_commentators_count(
-            self,
-            comments,
-            dt_begin=None,
-            dt_end=None
-    ):
+    def _get_commentators_count(self, comments, dt_begin=None, dt_end=None):
         """Возвращает число уникальных авторов.
 
         Авторов комментариев из предоставленного списка комментов.
@@ -473,10 +464,9 @@ class InstAnalytics:
             if dt_begin is None or dt_end is None:
                 commentators.add(comment.com_author)
             else:
-                if (
-                    dt_begin <= datetime.fromtimestamp(comment.com_time)
-                    and dt_end >= datetime.fromtimestamp(comment.com_time)
-                ):
+                if dt_begin <= datetime.fromtimestamp(
+                    comment.com_time
+                ) and dt_end >= datetime.fromtimestamp(comment.com_time):
                     commentators.add(comment.com_author)
 
         return len(commentators)
@@ -492,7 +482,7 @@ class InstAnalytics:
         )
         if saved:
             return saved
-        
+
         # получаем списки смайлов и символов
         all_emoji_list = self._load_symbols_list(
             "app/helper_files/all_emoji_list"
@@ -570,7 +560,7 @@ class InstAnalytics:
             "com_neu": neu_comms_cnt,
             "com_unq": commentators_cnt,
         }
-        
+
         self._save_profile_result(cache_footprint, stats_dict)
         return stats_dict
 
