@@ -159,14 +159,15 @@ class InstAnalytics:
 
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
-        time.sleep(self._wait_time)
-        uid = -1
-        try:
-            uid = self._api.user_info2(username)["id"]
-        except Exception as err:
-            # пользователь не найден
-            pass
-        return uid
+        for i in range(7):
+            time.sleep(self._wait_time)
+            try:
+                uid = self._api.user_info2(username)["id"]
+                return uid
+            except Exception as err:
+                # пользователь не найден
+                pass
+        return -1
     
     # проверка существования поста
     def _check_post_existance(self, link):
