@@ -159,14 +159,41 @@ class InstAnalytics:
 
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
-        time.sleep(self._wait_time)
-        uid = False
-        try:
-            uid = self._api.user_info2(username)["id"]
-        except Exception as err:
-            # пользователь не найден
-            pass
-        return uid
+        for i in range(7):
+            time.sleep(self._wait_time)
+            try:
+                uid = self._api.user_info2(username)["id"]
+                return uid
+            except Exception as err:
+                # пользователь не найден
+                pass
+        return False
+
+    # проверка существования поста
+    def _check_post_existance(self, link):
+
+        splitted_link = link.split("/")
+        if (
+            len(splitted_link) != 6
+            or (splitted_link[0] != "https:" and splitted_link[0] != "http:")
+            or splitted_link[1] != ""
+            or splitted_link[2] != "www.instagram.com"
+            or splitted_link[3] != "p"
+            or splitted_link[5] != ""
+        ):
+            return False
+
+        for i in range(7):
+            try:
+                time.sleep(self._wait_time)
+                post_comments = self._api.media_comments(
+                    splitted_link[4], count=50
+                )
+                return True
+            except Exception as err:
+                pass
+
+        return False
 
     def _load_symbols_list(self, rel_path: str):
         """Возвращает список символов, прочитанных из файла.
