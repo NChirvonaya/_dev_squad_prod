@@ -153,7 +153,7 @@ class InstAnalytics:
             try:
                 client = InstClient(auto_patch = True, drop_incompat_keys = False)
                 return client
-            except:
+            except Exception as err:
                 # если подключиться не удалось, пытаемся переподключиться
                 continue
 
@@ -163,7 +163,7 @@ class InstAnalytics:
         uid = -1
         try:
             uid = self._api.user_info2(username)["id"]
-        except:
+        except Exception as err:
             # пользователь не найден
             pass
         return uid
@@ -202,7 +202,7 @@ class InstAnalytics:
             all_media = []
             try:
                 all_media = self._api.user_feed(user_id, count = 50, end_cursor = next_page, extract = False)
-            except:
+            except Exception as err:
                 # если запрос не прошел, посылаем его заново
                 continue
 
@@ -250,7 +250,7 @@ class InstAnalytics:
                 post_comments = self._api.media_comments(
                     media_id, count=50, end_cursor=max_id
                 )
-            except Exception:
+            except Exception as err:
                 # если запрос не прошел, посылаем его заново
                 max_id = prev_max_id
                 continue
