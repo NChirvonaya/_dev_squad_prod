@@ -160,7 +160,7 @@ class InstAnalytics:
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
         time.sleep(self._wait_time)
-        uid = -1
+        uid = False
         try:
             uid = self._api.user_info2(username)["id"]
         except Exception as err:

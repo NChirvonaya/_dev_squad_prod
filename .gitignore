@@ -128,3 +128,5 @@ conf.json
 
 # SQLite database files
 *.db
+
+prof/
