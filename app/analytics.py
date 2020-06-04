@@ -169,7 +169,7 @@ class InstAnalytics:
         return uid
     
     # проверка существования поста
-    def checkPostExistance(self, link):
+    def _check_post_existance(self, link):
         
         splitted_link = link.split('/')
         if (len(splitted_link) != 6
