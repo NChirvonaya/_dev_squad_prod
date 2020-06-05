@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <br>
+    <h1 class="display-2 d-none d-xl-block" align="center">Profile statistics</h1>
+    <h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Profile statistics</h1>
+    <h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Profile statistics</h1>
+
+    <br>
+    <form action="" method="post">
+        <div class="form-row">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Username" name="username" value="{{
+                                      request.form.username }}">
+            </div>
+            <div class="col">
+                <input type="date" class="form-control" placeholder="From" name="from" id="datefrom">
+            </div>
+            <div class="col">
+                <input type="date" class="form-control" placeholder="To" name="to" id="dateto">
+            </div>
+        </div>
+        <br>
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        <input class="btn btn-primary btn-lg btn-block but-prim" type="submit" value="Go!">
+    </form>
+
+    <img src="{{ url_for('static', filename='profile.svg') }}" align="middle" class="stat-image">
+</div>
+
+<script>
+    $('#datefrom').datetimepicker({
+        format: 'DD-MM-YYYY',
+        locale: 'ru',
+        defaultDate: moment(),
+        maxDate: moment()
+    });
+</script>
+<script>
+    $('#dateto').datetimepicker({
+        format: 'DD-MM-YYYY',
+        locale: 'ru',
+        defaultDate: moment(),
+        maxDate: moment()
+    });
+</script>
+
+{% endblock%}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="display-2 d-none d-xl-block" align="center">Please, wait</h1>
+<h2 class="display-4 d-none d-xl-block" align="center">We are counting your comments</h2>
+
+<h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Please, wait</h1>
+<h2 class="display-5 d-none d-lg-block d-xl-none" align="center">We are counting your comments</h2>
+
+<h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Please, wait</h1>
+<h2 class="display-6 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">We are counting your comments</h2>
+
+<img src="{{ url_for('static', filename='loading.svg') }}" align="middle" class="index-image">
+
+<script>
+    $(function(){
+    setInterval(oneSecondFunction, 5000);
+    });
+
+    function oneSecondFunction() {
+        var xmlHttp = new XMLHttpRequest();
+
+        var ready_url = window.location.protocol + "//" + window.location.host + window.location.pathname + "/" + "_ready" + window.location.search
+        var error_url = window.location.protocol + "//" + window.location.host + "/error"
+
+        xmlHttp.open( "GET", ready_url, false ); // false for synchronous request
+        xmlHttp.send( null );
+        var isReady = JSON.parse(xmlHttp.responseText).ready
+        var error = JSON.parse(xmlHttp.responseText).error
+        if (isReady){
+            document.location.reload(true);
+        }
+        else{
+            if (error){
+                window.location.replace(error_url + "?error=" + error)
+            }
+        }
+        return ;
+    }
+</script>
+
+{% endblock%}

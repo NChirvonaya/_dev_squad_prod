@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <br>
+    <h1 class="display-2 d-none d-xl-block" align="center">Publication stats</h1>
+    <h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Publication stats</h1>
+    <h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Publication stats</h1>
+    <br>
+
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{ error }}
+        {% endif %}
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="{{ url_for('static', filename='publication.svg') }}" class="stat_val_image">
+            </div>
+            <div class="col-sm-6">
+                <table class="table">
+                    <tr>
+                        <th>Positive comments</th>
+                        <th>{{resp.com_pos}}</th>
+                    </tr>
+                    <tr>
+                        <th>Negative comments</th>
+                        <th>{{resp.com_neg}}</th>
+                    </tr>
+                    <tr>
+                        <th>Neutral comments</th>
+                        <th>{{resp.com_neu}}</th>
+                    </tr>
+                    <tr>
+                        <th>Unique commentators</th>
+                        <th>{{resp.com_unq_cnt}}</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+</div>
+{% endblock%}
