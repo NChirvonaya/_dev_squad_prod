@@ -1,0 +1,9 @@
+pytest
+pytest-cov
+pytest-sugar
+pytest-profiling
+coverage
+mypy
+flake8
+pylint
+pylint-fail-under

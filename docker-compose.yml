@@ -23,7 +23,7 @@ services:
         volumes:
           - app-data:$PWD/data/db
         ports:
-            - 5000:5000
+            - 80:5000
         networks:
             - instagrammer
         links:
