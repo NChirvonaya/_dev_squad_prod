@@ -166,32 +166,32 @@ class InstAnalytics:
                 uid = self._api.user_info2(username)["id"]
                 return uid
             except Exception as err:
-                raise Exception(f"could not find a user: {username}")
+                raise Exception(f"could not find a user {username}")
         return False
 
     # проверка существования поста
-    def _check_post_existance(self, link):
+    def _check_post_existance(self, post_id):
 
-        splitted_link = link.split("/")
-        if (
-            len(splitted_link) != 6
-            or (splitted_link[0] != "https:" and splitted_link[0] != "http:")
-            or splitted_link[1] != ""
-            or splitted_link[2] != "www.instagram.com"
-            or splitted_link[3] != "p"
-            or splitted_link[5] != ""
-        ):
-            return False
+        # splitted_link = link.split("/")
+        # if (
+        #     len(splitted_link) != 6
+        #     or (splitted_link[0] != "https:" and splitted_link[0] != "http:")
+        #     or splitted_link[1] != ""
+        #     or splitted_link[2] != "www.instagram.com"
+        #     or splitted_link[3] != "p"
+        #     or splitted_link[5] != ""
+        # ):
+        #     return False
 
         for i in range(1):
             try:
                 time.sleep(self._wait_time)
-                post_comments = self._api.media_comments(
-                    splitted_link[4], count=50
+                _ = self._api.media_comments(
+                    post_id, count=50
                 )
                 return True
             except Exception as err:
-                raise Exception(f"could not find a post: {link}")
+                raise Exception(f"could not find a post {post_id}")
 
         return False
 
@@ -619,6 +619,8 @@ class InstAnalytics:
         try:
             prefix = "https://www.instagram.com/p/"
             post_link = prefix + link
+
+            self._check_post_existance(link)
             # получаем списки смайлов и символов
             all_emoji_list = self._load_symbols_list(
                 "app/helper_files/all_emoji_list"
@@ -777,6 +779,9 @@ class InstAnalytics:
 
         cached = self._profile_cache.get(cache_footprint)
         if cached:
+            if cached.get("error"):
+                self._profile_cache.pop(cache_footprint)
+                return cached
             if cache_footprint in self._ordered_profiles:
                 self._ordered_profiles.remove(cache_footprint)
             search_from, search_to = self._serealize_dates(
