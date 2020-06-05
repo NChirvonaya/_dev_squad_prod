@@ -1,6 +1,9 @@
 """Declare Flask routes."""
 import os
+import re
 from urllib.parse import urlparse
+
+from hashlib import sha256
 
 from flask import (
     Blueprint,
@@ -9,6 +12,7 @@ from flask import (
     render_template,
     request,
     send_from_directory,
+    Markup
 )
 from flask_login import current_user, login_required, login_user, logout_user
 
@@ -70,7 +74,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
+        if user is None or not user.check_password(
+            sha256(str(form.password.data).encode()).hexdigest()
+        ):
             error = "Invalid username or password"
             return render_template("login.html", form=form, error=error)
 
@@ -92,6 +98,42 @@ def logout():
     return redirect(url_for("main.index"))
 
 
+def check_user(user):
+    rules = (
+        "<ul>"
+        '<li> Username must be more than 5 and less than 20 characters long</li>'
+        "<li> Username can contain characters:"
+        "<ul>"
+        "  <li>latin alphabet, </li>"
+        "  <li>digits, </li>"
+        "  <li>dots, </li>"
+        "  <li>underscores </li>"
+        "</ul>"
+        "<li> Username should not end with a dot"
+        "</ul>"
+    )
+    regex = r"[a-zA-z\.\-\d]{5,20}[a-zA-z\-\d]"
+    if not re.match(regex, user):
+        return rules
+    else:
+        return None
+
+
+def check_password(password):
+    rules = (
+        "<ul>"
+        '<li>Password at least 8 characters long</li>'
+        "<li>Password must contain at least one letter and one digit</li>"
+        "<li>Password cannot contain spaces</li>"
+        "</ul>"
+    )
+    regex = r"^(?=.*?[A-za-z])(?=.*?[0-9])\S{8,}$"
+    if not re.match(regex, password):
+        return rules
+    else:
+        return None
+
+
 @server_bp.route("/register/", methods=["GET", "POST"])
 def register():
     """Register new user."""
@@ -101,16 +143,30 @@ def register():
     try:
         form = RegistrationForm()
         if form.validate_on_submit():
-            user = User(username=form.username.data)
-            user.set_password(form.password.data)
+            username = str(form.username.data)
+            password = str(form.password.data)
+
+            error = None
+            error = check_user(username)
+            if error:
+                raise Exception
+            error = check_password(password)
+            if error:
+                raise Exception
+
+            user = User(username=username)
+            user.set_password(
+                sha256(password.encode()).hexdigest()
+            )
             db.session.add(user)
             db.session.commit()
 
             return redirect(url_for("main.login"))
     except Exception:
-        error = "This user already exists"
+        if error is None:
+            error = "This user already exists"
         return render_template(
-            "register.html", title="Register", form=form, error=error
+            "register.html", title="Register", form=form, error=Markup(error)
         )
 
     return render_template("register.html", title="Register", form=form)
