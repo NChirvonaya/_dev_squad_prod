@@ -12,12 +12,12 @@
 
 ## Архитектура
 
-|                 |                 |
-| --------------- | --------------- |
-| **Frontend**    | HTML + CSS      |
-| **Backend**     | Python3 + Flask |
-| **База данных** | MongoDB         |
-| **Деплой**      | Heroku          |
+|                 |                      |
+| --------------- | -------------------- |
+| **Frontend**    | HTML + CSS           |
+| **Backend**     | Python3 + Flask      |
+| **База данных** | MongoDB              |
+| **Деплой**      | DigitalOcean droplet |
 
 ### Описание базы данных
 
