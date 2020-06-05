@@ -21,6 +21,9 @@
 </form> -->
 <div class="row">
     <div class="col-lg-7">
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error|safe }}
+        {% endif %}
         <form action="" method="post" novalidate>
             {{ form.hidden_tag() }}
             <div class="form-group">
@@ -31,19 +34,16 @@
                 <label for="examplePassUser1">Password</label>
                 {{ form.password(class_="form-control") }}
             </div>
-            {% if error %}
-            <p class="error"><strong>Error:</strong> {{ error }}
-                {% endif %}
-                <br>
+            <br>
 
-                {{ form.submit(class_="btn btn-primary btn-raised") }}
+            {{ form.submit(class_="btn btn-primary btn-raised") }}
         </form>
     </div>
-    {% if error %}
+    <!-- {% if error %}
     <br>
     <h3 class="error"><strong>Error:</strong> {{ error }}</h3>
     <br>
-    {% endif %}
+    {% endif %} -->
     <div class="col-lg-5">
         <img src="{{ url_for('static', filename='login.svg') }}" align="middle" class="login-image">
     </div>
