@@ -20,16 +20,20 @@
     function oneSecondFunction() {
         var xmlHttp = new XMLHttpRequest();
 
-        var ready_url = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname +
-        "/" + "_ready" + window.location.search
+        var ready_url = window.location.protocol + "//" + window.location.host + window.location.pathname + "/" + "_ready" + window.location.search
+        var error_url = window.location.protocol + "//" + window.location.host + "/error"
 
         xmlHttp.open( "GET", ready_url, false ); // false for synchronous request
         xmlHttp.send( null );
         var isReady = JSON.parse(xmlHttp.responseText).ready
+        var error = JSON.parse(xmlHttp.responseText).error
         if (isReady){
             document.location.reload(true);
         }
         else{
+            if (error){
+                window.location.replace(error_url + "?error=" + error)
+            }
         }
         return ;
     }

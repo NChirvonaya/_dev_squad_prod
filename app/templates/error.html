@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="display-2 d-none d-xl-block" align="center">Something went wrong.</h1>
+<h1 class="display-3 d-none d-lg-block d-xl-none" align="center">Something went wrong.</h1>
+<h1 class="display-4 d-xs-block d-sm-block d-md-block d-lg-none d-xl-none" align="center">Something went wrong.</h1>
+
+{% if error %}
+<br>
+<h3 class="error"><strong>Error:</strong> {{ error }}</h3>
+{% endif %}
+
+<img src="{{ url_for('static', filename='400.svg') }}" class="index-image">
+{% endblock %}

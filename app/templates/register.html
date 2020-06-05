@@ -39,6 +39,11 @@
                 {{ form.submit(class_="btn btn-primary btn-raised") }}
         </form>
     </div>
+    {% if error %}
+    <br>
+    <h3 class="error"><strong>Error:</strong> {{ error }}</h3>
+    <br>
+    {% endif %}
     <div class="col-lg-5">
         <img src="{{ url_for('static', filename='login.svg') }}" align="middle" class="login-image">
     </div>

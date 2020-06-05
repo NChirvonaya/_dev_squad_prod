@@ -98,16 +98,29 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
+    try:
+        form = RegistrationForm()
+        if form.validate_on_submit():
+            user = User(username=form.username.data)
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
 
-        return redirect(url_for("main.login"))
+            return redirect(url_for("main.login"))
+    except Exception:
+        error = "This user already exists"
+        return render_template(
+            "register.html", title="Register", form=form, error=error
+        )
 
     return render_template("register.html", title="Register", form=form)
+
+
+@server_bp.route("/error", methods=["GET", "POST"])
+def error_page():
+    """Stats homepage."""
+    error = request.args.get("error")
+    return render_template("error.html", title="Error", error=error)
 
 
 @server_bp.route("/stats", methods=["GET", "POST"])
@@ -166,10 +179,13 @@ def user_stats(username):
 @server_bp.route("/stats/profile/<username>/_ready")
 @login_required
 def user_stats__ready(username):
-    if ANALYTICS.get_profile_results(username):
-        return {"ready": True}
-    else:
+    result = ANALYTICS.get_profile_results(username)
+    if not result:
         return {"ready": False}
+    elif result.get("error"):
+        return {"ready": False, "error": result["error"]}
+    else:
+        return {"ready": True}
 
 
 @server_bp.route("/stats/profile/<username>/results")
@@ -191,10 +207,27 @@ def post_stats():
         url = request.form["url"]
         if url is None or url == "":
             error = "Empty url"
-            return render_template("post.html", title="Stats", error=error)
-        post_link = urlparse(url).path.split("/")[2]
-        return redirect(url_for("main.post_link_stats", post_link=post_link))
+            return render_template(
+                "stats/post.html", title="Stats", error=error
+            )
+        try:
+            post_link = urlparse(url).path.split("/")[2]
+            return redirect(
+                url_for("main.post_link_stats", post_link=post_link)
+            )
+        except Exception:
+            error = (
+                "Please use this format: http://www.instagram.com/p/<postID>"
+            )
+            return render_template(
+                "stats/post.html", title="Stats", error=error
+            )
     return render_template("stats/post.html", title="Stats")
+
+
+@server_bp.route("/stats/_check_user/<user>", methods=["GET", "POST"])
+def _check_user(user):
+    return ANALYTICS._get_user_id(user)
 
 
 @server_bp.route("/stats/post/<post_link>")
@@ -220,11 +253,13 @@ def post_link_stats(post_link):
 @login_required
 def post_link_stats__ready(post_link):
     """Top secret page."""
-    post_link = post_link
-    if ANALYTICS.get_post_results(post_link):
-        return {"ready": True}
-    else:
+    result = ANALYTICS.get_post_results(post_link)
+    if not result:
         return {"ready": False}
+    elif result.get("error"):
+        return {"ready": False, "error": result["error"]}
+    else:
+        return {"ready": True}
 
 
 @server_bp.route("/stats/post/<post_link>/results")

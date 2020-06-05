@@ -2,6 +2,7 @@
 import codecs
 import hashlib
 import os
+import logging
 import random
 import string
 import time
@@ -159,14 +160,13 @@ class InstAnalytics:
 
     def _get_user_id(self, username):
         """Возвращает id юзера по нику."""
-        for i in range(7):
+        for i in range(1):
             time.sleep(self._wait_time)
             try:
                 uid = self._api.user_info2(username)["id"]
                 return uid
             except Exception as err:
-                # пользователь не найден
-                pass
+                raise Exception(f"could not find a user: {username}")
         return False
 
     # проверка существования поста
@@ -183,7 +183,7 @@ class InstAnalytics:
         ):
             return False
 
-        for i in range(7):
+        for i in range(1):
             try:
                 time.sleep(self._wait_time)
                 post_comments = self._api.media_comments(
@@ -191,7 +191,7 @@ class InstAnalytics:
                 )
                 return True
             except Exception as err:
-                pass
+                raise Exception(f"could not find a post: {link}")
 
         return False
 
@@ -233,6 +233,7 @@ class InstAnalytics:
                 )
             except Exception as err:
                 # если запрос не прошел, посылаем его заново
+                logging.error(f"MediaList {err}, {user_id}, {username}")
                 continue
 
             # записываем id полученных медиа профиля в лист
@@ -297,9 +298,11 @@ class InstAnalytics:
             # оставляем только нужную информацию
             for comm in post_comments:
                 if dt_begin is not None and dt_end is not None:
-                    if dt_begin <= datetime.fromtimestamp(
+                    if dt_begin <= datetime.utcfromtimestamp(
                         comm["created_at"]
-                    ) and dt_end >= datetime.fromtimestamp(comm["created_at"]):
+                    ) and dt_end >= datetime.utcfromtimestamp(
+                        comm["created_at"]
+                    ):
                         res.append(
                             Comment(
                                 media_id,
@@ -491,9 +494,9 @@ class InstAnalytics:
             if dt_begin is None or dt_end is None:
                 commentators.add(comment.com_author)
             else:
-                if dt_begin <= datetime.fromtimestamp(
+                if dt_begin <= datetime.utcfromtimestamp(
                     comment.com_time
-                ) and dt_end >= datetime.fromtimestamp(comment.com_time):
+                ) and dt_end >= datetime.utcfromtimestamp(comment.com_time):
                     commentators.add(comment.com_author)
 
         return len(commentators)
@@ -508,87 +511,103 @@ class InstAnalytics:
             order=False,
         )
         if saved:
+            logging.warning(f"Have saved {cache_footprint}")
             return saved
 
-        # получаем списки смайлов и символов
-        all_emoji_list = self._load_symbols_list(
-            "app/helper_files/all_emoji_list"
-        )
-        positive_emoji_list = self._load_symbols_list(
-            "app/helper_files/positive_emoji_list"
-        )
-        negative_emoji_list = self._load_symbols_list(
-            "app/helper_files/negative_emoji_list"
-        )
-        permitted_nickname_symbols = self._load_symbols_list(
-            "app/helper_files/nickname_symbols_list"
-        )
+        try:
+            logging.warning(f"Step 1 {cache_footprint}")
 
-        username = cache_footprint[0]
-        dt_begin = cache_footprint[1]
-        dt_end = cache_footprint[2]
+            # получаем списки смайлов и символов
+            all_emoji_list = self._load_symbols_list(
+                "app/helper_files/all_emoji_list"
+            )
+            positive_emoji_list = self._load_symbols_list(
+                "app/helper_files/positive_emoji_list"
+            )
+            negative_emoji_list = self._load_symbols_list(
+                "app/helper_files/negative_emoji_list"
+            )
+            permitted_nickname_symbols = self._load_symbols_list(
+                "app/helper_files/nickname_symbols_list"
+            )
 
-        # получаем список постов в профиле
-        posts = self._get_profile_media_list(username)
+            username = cache_footprint[0]
+            dt_begin = cache_footprint[1]
+            dt_end = cache_footprint[2]
 
-        # получаем список всех комментов в профиле
-        comments = self._get_posts_comments(posts, dt_begin, dt_end)
-        # немного причесываем комменты
-        self._filter_comments(
-            comments, permitted_nickname_symbols, all_emoji_list
-        )
-        # вычисляем эмоциональный окрас комментов
-        self._get_emotional_color_comments(
-            comments, positive_emoji_list, negative_emoji_list
-        )
+            # получаем список постов в профиле
+            posts = self._get_profile_media_list(username)
 
-        # общее число постов с комментами
-        posts_with_comments_cnt = self._get_posts_with_comments_count(
-            comments, dt_begin, dt_end
-        )
+            logging.warning(f"Step 2 {cache_footprint}")
 
-        # общее число постов без комментов
-        posts_without_comments_cnt = len(posts) - posts_with_comments_cnt
+            # получаем список всех комментов в профиле
+            comments = self._get_posts_comments(posts, dt_begin, dt_end)
 
-        # число положительных, отрицательных и нейтральных постов в профиле
-        pos_posts_cnt, neg_posts_cnt, _ = self._get_pos_neg_neu_posts_count(
-            comments
-        )
-        neu_posts_cnt = len(posts) - pos_posts_cnt - neg_posts_cnt
+            logging.warning(f"Step 3 {cache_footprint}")
 
-        # общее число комментов к профилю
-        comments_cnt = len(comments)
+            # немного причесываем комменты
+            self._filter_comments(
+                comments, permitted_nickname_symbols, all_emoji_list
+            )
+            # вычисляем эмоциональный окрас комментов
+            self._get_emotional_color_comments(
+                comments, positive_emoji_list, negative_emoji_list
+            )
 
-        # число положительных, отрицательных и нейтральных комментов в профиле
-        (
-            pos_comms_cnt,
-            neg_comms_cnt,
-            neu_comms_cnt,
-        ) = self._get_pos_neg_neu_comments_count(comments)
+            # общее число постов с комментами
+            posts_with_comments_cnt = self._get_posts_with_comments_count(
+                comments, dt_begin, dt_end
+            )
 
-        # число различных комментаторов в профиле
-        commentators_cnt = self._get_commentators_count(
-            comments, dt_begin, dt_end
-        )
+            # общее число постов без комментов
+            posts_without_comments_cnt = len(posts) - posts_with_comments_cnt
 
-        # заполняем итоговый массив
-        stats_dict = {
-            "username": cache_footprint[0],
-            "search_from": cache_footprint[1],
-            "search_to": cache_footprint[2],
-            "w_com": posts_with_comments_cnt,
-            "wt_com": posts_without_comments_cnt,
-            "post_pos": pos_posts_cnt,
-            "post_neg": neg_posts_cnt,
-            "post_neu": neu_posts_cnt,
-            "com_all": comments_cnt,
-            "com_pos": pos_comms_cnt,
-            "com_neg": neg_comms_cnt,
-            "com_neu": neu_comms_cnt,
-            "com_unq": commentators_cnt,
-        }
+            # число положительных, отрицательных и нейтральных постов в профиле
+            (
+                pos_posts_cnt,
+                neg_posts_cnt,
+                _,
+            ) = self._get_pos_neg_neu_posts_count(comments)
+            neu_posts_cnt = len(posts) - pos_posts_cnt - neg_posts_cnt
 
+            # общее число комментов к профилю
+            comments_cnt = len(comments)
+
+            # число положительных, отрицательных и нейтральных комментов в профиле
+            (
+                pos_comms_cnt,
+                neg_comms_cnt,
+                neu_comms_cnt,
+            ) = self._get_pos_neg_neu_comments_count(comments)
+
+            # число различных комментаторов в профиле
+            commentators_cnt = self._get_commentators_count(
+                comments, dt_begin, dt_end
+            )
+
+            # заполняем итоговый массив
+            stats_dict = {
+                "username": cache_footprint[0],
+                "search_from": cache_footprint[1],
+                "search_to": cache_footprint[2],
+                "w_com": posts_with_comments_cnt,
+                "wt_com": posts_without_comments_cnt,
+                "post_pos": pos_posts_cnt,
+                "post_neg": neg_posts_cnt,
+                "post_neu": neu_posts_cnt,
+                "com_all": comments_cnt,
+                "com_pos": pos_comms_cnt,
+                "com_neg": neg_comms_cnt,
+                "com_neu": neu_comms_cnt,
+                "com_unq": commentators_cnt,
+            }
+
+            logging.warning(f"Step 4 {cache_footprint}")
+
+        except Exception as err:
+            stats_dict = {"error": str(err)}
         self._save_profile_result(cache_footprint, stats_dict)
+        logging.warning(f"Step 5, fin {cache_footprint}")
         return stats_dict
 
     def _order_post_stats(self, link):
@@ -597,57 +616,60 @@ class InstAnalytics:
         if saved:
             return saved
 
-        prefix = "https://www.instagram.com/p/"
-        post_link = prefix + link
-        # получаем списки смайлов и символов
-        all_emoji_list = self._load_symbols_list(
-            "app/helper_files/all_emoji_list"
-        )
-        positive_emoji_list = self._load_symbols_list(
-            "app/helper_files/positive_emoji_list"
-        )
-        negative_emoji_list = self._load_symbols_list(
-            "app/helper_files/negative_emoji_list"
-        )
-        permitted_nickname_symbols = self._load_symbols_list(
-            "app/helper_files/nickname_symbols_list"
-        )
+        try:
+            prefix = "https://www.instagram.com/p/"
+            post_link = prefix + link
+            # получаем списки смайлов и символов
+            all_emoji_list = self._load_symbols_list(
+                "app/helper_files/all_emoji_list"
+            )
+            positive_emoji_list = self._load_symbols_list(
+                "app/helper_files/positive_emoji_list"
+            )
+            negative_emoji_list = self._load_symbols_list(
+                "app/helper_files/negative_emoji_list"
+            )
+            permitted_nickname_symbols = self._load_symbols_list(
+                "app/helper_files/nickname_symbols_list"
+            )
 
-        # получаем id поста
-        posts = [Post(self._get_post_id_by_link(post_link), 0)]
+            # получаем id поста
+            posts = [Post(self._get_post_id_by_link(post_link), 0)]
 
-        # получаем список всех комментов к посту
-        comments = self._get_posts_comments(posts)
-        # немного причесываем комменты
-        self._filter_comments(
-            comments, permitted_nickname_symbols, all_emoji_list
-        )
-        # вычисляем эмоциональный окрас комментов
-        self._get_emotional_color_comments(
-            comments, positive_emoji_list, negative_emoji_list
-        )
+            # получаем список всех комментов к посту
+            comments = self._get_posts_comments(posts)
+            # немного причесываем комменты
+            self._filter_comments(
+                comments, permitted_nickname_symbols, all_emoji_list
+            )
+            # вычисляем эмоциональный окрас комментов
+            self._get_emotional_color_comments(
+                comments, positive_emoji_list, negative_emoji_list
+            )
 
-        # число положительных, отрицательных и нейтральных комментов в профиле
-        (
-            pos_comms_cnt,
-            neg_comms_cnt,
-            neu_comms_cnt,
-        ) = self._get_pos_neg_neu_comments_count(comments)
+            # число положительных, отрицательных и нейтральных комментов в профиле
+            (
+                pos_comms_cnt,
+                neg_comms_cnt,
+                neu_comms_cnt,
+            ) = self._get_pos_neg_neu_comments_count(comments)
 
-        # число различных комментаторов к посту
-        commentators_cnt = self._get_commentators_count(comments)
+            # число различных комментаторов к посту
+            commentators_cnt = self._get_commentators_count(comments)
 
-        # заполняем итоговый словарь
-        stats_dict = {
-            "post_link": link,
-            "com_pos": pos_comms_cnt,
-            "com_neg": neg_comms_cnt,
-            "com_neu": neu_comms_cnt,
-            "com_unq_cnt": commentators_cnt,
-        }
+            # заполняем итоговый словарь
+            stats_dict = {
+                "post_link": link,
+                "com_pos": pos_comms_cnt,
+                "com_neg": neg_comms_cnt,
+                "com_neu": neu_comms_cnt,
+                "com_unq_cnt": commentators_cnt,
+            }
+
+        except Exception as err:
+            stats_dict = {"error": str(err)}
 
         self._save_post_result(link, stats_dict)
-
         return stats_dict
 
     def _store_post_result(self, post_link, stats_dict: dict):
@@ -813,10 +835,10 @@ class InstAnalytics:
             datetime.strptime(_first_post, _format),
         )
         if not date_to:
-            parsed_dates["search_to"] = datetime.now()
+            parsed_dates["search_to"] = datetime.utcnow()
         else:
             parsed_dates["search_to"] = min(
-                datetime.strptime(date_to, _format), datetime.now()
+                datetime.strptime(date_to, _format), datetime.utcnow()
             )
 
         parsed_dates["search_from"] = parsed_dates["search_from"].replace(
