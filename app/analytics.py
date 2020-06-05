@@ -163,7 +163,7 @@ class InstAnalytics:
         for i in range(1):
             time.sleep(self._wait_time)
             try:
-                uid = self._api.user_info2(username)["id"]
+                uid = self._api.user_info2(str(username))["id"]
                 return uid
             except Exception as err:
                 raise Exception(f"could not find a user {username}")

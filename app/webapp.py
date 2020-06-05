@@ -193,6 +193,13 @@ def user_stats__ready(username):
 def user_stats_results(username):
     response_cur = request.args["json"]
     resp_dict = json.loads(response_cur)
+    if resp_dict.get("error"):
+        return redirect(
+            url_for(
+                "main.error_page",
+                error=resp_dict["error"]
+            ),
+        )
     response_cur = ProfileStats(**resp_dict)
     return render_template(
         "stats/personal.html", name=username, resp=response_cur
@@ -268,6 +275,13 @@ def post_link_stats_results(post_link):
     post_link = post_link
     response_cur = request.args["json"]
     resp_dict = json.loads(response_cur)
+    if resp_dict.get("error"):
+        return redirect(
+            url_for(
+                "main.error_page",
+                error=resp_dict["error"]
+            ),
+        )
     response_cur = PostStats(**resp_dict)
     return render_template(
         "stats/publication.html", name=post_link, resp=response_cur
